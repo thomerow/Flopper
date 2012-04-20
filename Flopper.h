@@ -7,6 +7,6 @@ void VelocityChange(byte channel, byte note, byte velocity);
 void _ControlChange(byte channel, byte control, byte value);
 void _ProgramChange(byte channel, byte program);
 void AfterTouch(byte channel, byte pressure);
-void PitchChange(byte channel, int pitch);
+void PitchChange(uint8_t channel, uint16_t pitch);
   
 #endif // __FLOPPER_H__

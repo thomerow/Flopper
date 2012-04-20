@@ -1,5 +1,10 @@
 #include <SPI.h>
 #include "Flopper.h"
+#include "TimerOne.h"
+
+
+#define TIMER_RESOLUTION  40    // microseconds
+#define POSITION_MAX      158   // tracks x 2 (each track is two stepper motor steps wide)
 
 
 void setup()
@@ -17,12 +22,22 @@ void setup()
   usbMIDI.setHandleProgramChange(_ProgramChange);
   usbMIDI.setHandleAfterTouch(AfterTouch);
   usbMIDI.setHandlePitchChange(PitchChange);
+  
+  // Init timer
+  Timer1.initialize(RESOLUTION); // Set up a timer at the defined resolution
+  Timer1.attachInterrupt(tick); // Attach the tick function
 } // setup
 
 void loop()
 {
-
+  // Read MIDI messages
+  usbMIDI.read();
 } // loop
+
+void tick()
+{
+  
+} // tick
 
 void _NoteOn(byte channel, byte note, byte velocity)
 {
@@ -54,7 +69,7 @@ void AfterTouch(byte channel, byte pressure)
 
 } // AfterTouch
 
-void PitchChange(byte channel, int pitch)
+void PitchChange(uint8_t channel, uint16_t pitch)
 {
 
 } // PitchChange
