@@ -24,7 +24,7 @@ void setup()
   usbMIDI.setHandlePitchChange(PitchChange);
   
   // Init timer
-  Timer1.initialize(RESOLUTION); // Set up a timer at the defined resolution
+  Timer1.initialize(TIMER_RESOLUTION); // Set up a timer at the defined resolution
   Timer1.attachInterrupt(tick); // Attach the tick function
 } // setup
 
