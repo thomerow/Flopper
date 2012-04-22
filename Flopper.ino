@@ -10,6 +10,7 @@
 #define DIR_UP            0     // Upward direction
 #define DIR_DOWN          1     // Downward direction
 #define RANDOM_NUMBERS    30    // Size of random drive number table
+#define LED_PIN           11    // Teensy led pin
 
 /**
  * @brief  Note length in microseconds
@@ -78,10 +79,16 @@ void setup()
 {
   int i;
   
+  pinMode(LED_PIN, OUTPUT);
+  
   pinMode(SS, OUTPUT);
   digitalWrite(SS, HIGH);
   SPI.setClockDivider(SPI_CLOCK_DIV2);
   SPI.begin();
+
+  // Init registers
+  for (i = 0; i < uRegisters; ++i) registerState[i] = 0;
+  updateRegisters();
 
   // Calculate ticks per note
   for (i = 0; i < MIDI_NOTES; ++i) {     
@@ -99,10 +106,6 @@ void setup()
     currentPos[i] = POSITION_MAX;
   }
   
-  for (i = 0; i < uRegisters; ++i) registerState[i] = 0;
-
-  initDrivePinInf();
-
   // Register MIDI callback functions
   usbMIDI.setHandleNoteOff(_NoteOff);
   usbMIDI.setHandleNoteOn(_NoteOn);
@@ -112,12 +115,14 @@ void setup()
   usbMIDI.setHandleAfterTouch(AfterTouch);
   usbMIDI.setHandlePitchChange(PitchChange);  
   
+  initDrivePinInf();
+
   // Init drive positions
   resetAllPositions();
   
   // Init timer
-  Timer1.initialize(TIMER_RESOLUTION); // Set up a timer at the defined resolution
-  Timer1.attachInterrupt(tick); // Attach the tick function
+  Timer1.initialize(TIMER_RESOLUTION);  // Set up a timer at the defined resolution
+  Timer1.attachInterrupt(timerInt);     // Attach the timer function
 } // setup
 
 void loop()
@@ -130,7 +135,7 @@ void initDrivePinInf()
 {
   for (int i = 0; i < DRIVES; ++i) {
     drivePinInf[i].uReg = ((i * 2) - 1) / 8;
-    drivePinInf[i].uDirPin = i % 8;
+    drivePinInf[i].uDirPin = (i * 2) % 8;
     drivePinInf[i].uStepPin = drivePinInf[i].uDirPin + 1;
   }
 } // initDrivePinInf
@@ -149,15 +154,12 @@ inline void prepareStep(byte uDrive)
   uStepPin = drivePinInf[uDrive].uStepPin;
   uDirPin = drivePinInf[uDrive].uDirPin;
 
-  // Get current motor pin state
-  uStepPinState = registerState[uReg] & (1 << uStepPin);
-
   // Clear direction pin state
   registerState[uReg] &= ~(1 << uDirPin);
   
   // Set new pin states
-  registerState[uReg] ^= uStepPinState;                    // Toggle motor pin
-  registerState[uReg] |= (currentDir[uDrive] << uDirPin);  // Set direction pin
+  registerState[uReg] ^= (1 << uStepPin);                    // Toggle motor pin
+  registerState[uReg] |= (currentDir[uDrive] << uDirPin);    // Set direction pin
   
   if (DIR_UP) ++currentPos[uDrive]; else --currentPos[uDrive];
 } // prepareStep
@@ -171,11 +173,11 @@ inline void tick(byte uDrive)
   currentTicks[uDrive] = 0;
 } // tick
 
-void tick()
+void timerInt()
 {
   for (int i = 0; i < DRIVES; ++i) tick(i);  
   updateRegisters();
-} // tick
+} // timerInt
 
 void _NoteOn(byte channel, byte note, byte velocity)
 {
@@ -213,10 +215,12 @@ void PitchChange(uint8_t channel, uint16_t pitch)
   // ToDo: implement.
 } // PitchChange
 
-void updateRegisters()
+inline void updateRegisters()
 {
+  byte i;
+  
   digitalWrite(SS, LOW);
-  for (byte i = 0; i < uRegisters; ++i) SPI.transfer(registerState[i]);
+  for (i = 0; i < uRegisters; ++i) SPI.transfer(registerState[i]);
   digitalWrite(SS, HIGH);
 } // updateRegisters
 
@@ -226,11 +230,12 @@ void updateRegisters()
  */
 void resetAllPositions()
 {
-  for (int i = 0; i < POSITION_MAX * 2; ++i) {
+  for (int i = 0; i < POSITION_MAX; ++i) {
     for (int j = 0; j < DRIVES; ++j) {
-      if (currentPos[i]) prepareStep(i);
-    }
+      if (currentPos[j]) prepareStep(j);
+    }    
     updateRegisters();
+    delay(10);
   }
 } // resetAllPositions
 

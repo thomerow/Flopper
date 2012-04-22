@@ -9,4 +9,6 @@ void _ProgramChange(byte channel, byte program);
 void AfterTouch(byte channel, byte pressure);
 void PitchChange(uint8_t channel, uint16_t pitch);
   
+void updateRegisters();
+  
 #endif // __FLOPPER_H__
