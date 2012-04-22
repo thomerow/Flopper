@@ -91,7 +91,7 @@ void setup()
   resetAllPositions();
   
   // Init timer
-  Timer1.initialize(RESOLUTION); // Set up a timer at the defined resolution
+  Timer1.initialize(TIMER_RESOLUTION); // Set up a timer at the defined resolution
   Timer1.attachInterrupt(tick); // Attach the tick function
 } // setup
 
@@ -115,37 +115,37 @@ void tick()
 
 void _NoteOn(byte channel, byte note, byte velocity)
 {
-  
+  // ToDo: implement.
 } // NoteOn
 
 void _NoteOff(byte channel, byte note, byte velocity)
 {
-
+  // ToDo: implement.
 } // NoteOff
 
 void VelocityChange(byte channel, byte note, byte velocity)
 {
-
+  // ToDo: implement.
 } // VelocityChange
 
 void _ControlChange(byte channel, byte control, byte value)
 {
-
+  // ToDo: implement.
 } // ControlChange
 
 void _ProgramChange(byte channel, byte program)
 {
-
+  // ToDo: implement.
 } // ProgramChange
 
 void AfterTouch(byte channel, byte pressure)
 {
-
+  // ToDo: implement.
 } // AfterTouch
 
 void PitchChange(uint8_t channel, uint16_t pitch)
 {
-
+  // ToDo: implement.
 } // PitchChange
 
 
