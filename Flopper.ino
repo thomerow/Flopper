@@ -162,7 +162,7 @@ inline void prepareStep(byte uDrive)
   if (!currentPos[uDrive]) currentDir[uDrive] = DIR_UP;
   else if (currentPos[uDrive] == POSITION_MAX) currentDir[uDrive] = DIR_DOWN;
 
-  if (DIR_UP) ++currentPos[uDrive]; else --currentPos[uDrive];
+  if (currentDir[uDrive] == DIR_UP) ++currentPos[uDrive]; else --currentPos[uDrive];
   
   DrivePinInfo& pinInf = drivePinInf[uDrive];
   byte& regState = nextRegState[pinInf.uReg];
