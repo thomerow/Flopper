@@ -100,7 +100,7 @@ inline void tick(byte uDrive)
 {
   if (!currentNote[uDrive]) return;
   ++currentTicks[uDrive];
-  if (currentTicks[uDrive] != noteTicks[currentNote[uDrive]]) return;
+  if (currentTicks[uDrive] < noteTicks[currentNote[uDrive]]) return;
   prepareStep(uDrive);
   currentTicks[uDrive] = 0;
 } // tick

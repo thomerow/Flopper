@@ -47,7 +47,7 @@ int noteTicks[MIDI_NOTES];
 /**
  * Note of the playing drives.
  */
-byte currentNote[DRIVES];
+volatile byte currentNote[DRIVES];
 
 /**
  * Elapsed ticks of playing drives.
