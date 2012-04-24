@@ -41,6 +41,8 @@ inline LinkedNoteList* NoteStack_lastElem(LinkedNoteList *pStack)
 
 void NoteStack_push(LinkedNoteList **ppStack, byte uNote)
 {  
+  if (!uNote) return;
+  
   LinkedNoteList* pElemNew = (LinkedNoteList*) malloc(sizeof(LinkedNoteList));
   pElemNew->uNote = uNote;
   pElemNew->pPrev = NoteStack_lastElem(*ppStack);
