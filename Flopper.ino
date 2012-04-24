@@ -225,7 +225,6 @@ void playNote(byte uNote)
   
   // Push currently playing note onto the stack
   if (currentNote[0]) NoteStack_push(&pNoteStack, currentNote[0]);
-  
   currentNote[0] = uNote;
 } // playNote
 
@@ -233,9 +232,9 @@ void stopNote(byte uNote)
 {
   if (!noteTicks[uNote]) return;
   
-  // Erase note from the stack (if it is part of it) and play last played note (if there is any).
-  NoteStack_erase(&pNoteStack, uNote);
-  currentNote[0] = NoteStack_popLast(&pNoteStack);
+  // Play previously played note.
+  if (uNote != currentNote[0]) NoteStack_erase(&pNoteStack, uNote);  
+  else currentNote[0] = NoteStack_popLast(&pNoteStack);
 } // stopNote
 
 
