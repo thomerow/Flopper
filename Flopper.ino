@@ -3,7 +3,6 @@
 #include "TimerOne.h"
 
 
-
 void setup()
 {
   int i;
@@ -57,11 +56,13 @@ void setup()
   Timer1.attachInterrupt(timerInt);     // Attach the timer function
 } // setup
 
+
 void loop()
 {
   // Read MIDI messages
   usbMIDI.read();
 } // loop
+
 
 void initDrivePinInf()
 {
@@ -71,6 +72,7 @@ void initDrivePinInf()
     drivePinInf[i].uStepPin = drivePinInf[i].uDirPin + 1;
   }
 } // initDrivePinInf
+
 
 /**
  * Sets register state so drive nDrive makes one step on updateRegisters().
@@ -93,6 +95,7 @@ inline void prepareStep(byte uDrive)
   regState |= (currentDir[uDrive] << pinInf.uDirPin);    // Set direction pin
 } // prepareStep
 
+
 inline void tick(byte uDrive) 
 {
   if (!currentNote[uDrive]) return;
@@ -102,11 +105,13 @@ inline void tick(byte uDrive)
   currentTicks[uDrive] = 0;
 } // tick
 
+
 void timerInt()
 {
   for (int i = 0; i < DRIVES; ++i) tick(i);  
   updateRegisters();
 } // timerInt
+
 
 void _NoteOn(byte channel, byte note, byte velocity)
 {
@@ -114,35 +119,42 @@ void _NoteOn(byte channel, byte note, byte velocity)
   else stopNote(note);
 } // NoteOn
 
+
 void _NoteOff(byte channel, byte note, byte velocity)
 {
   stopNote(note);
 } // NoteOff
+
 
 void VelocityChange(byte channel, byte note, byte velocity)
 {
   // ToDo: implement.
 } // VelocityChange
 
+
 void _ControlChange(byte channel, byte control, byte value)
 {
   // ToDo: implement.
 } // ControlChange
+
 
 void _ProgramChange(byte channel, byte program)
 {
   // ToDo: implement.
 } // ProgramChange
 
+
 void AfterTouch(byte channel, byte pressure)
 {
   // ToDo: implement.
 } // AfterTouch
 
+
 void PitchChange(uint8_t channel, uint16_t pitch)
 {
   // ToDo: implement.
 } // PitchChange
+
 
 inline void updateRegisters()
 {
@@ -165,6 +177,7 @@ inline void updateRegisters()
   }
   digitalWrite(SS, HIGH);  
 } // updateRegisters
+
 
 /**
  * Advances stepper motor positions of all drives until
@@ -198,16 +211,19 @@ byte findNextIdleDrive()
   return uResult;
 } // findFirstIdleDrive
 
+
 inline int findDrivePlayingNote(byte uNote)
 {
   for (int i = 0; i < DRIVES; ++i) if (currentNote[i] == uNote) return i;
 } // findDrivePlayingNote
+
 
 void playNote(byte uNote)
 {  
   if (!noteTicks[uNote]) return;
   currentNote[findNextIdleDrive()] = uNote;
 } // playNote
+
 
 void stopNote(byte uNote)
 {
@@ -227,6 +243,7 @@ void playNote(byte uNote)
   if (currentNote[0]) NoteStack_push(&pNoteStack, currentNote[0]);
   currentNote[0] = uNote;
 } // playNote
+
 
 void stopNote(byte uNote)
 {

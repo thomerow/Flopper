@@ -18,7 +18,6 @@ LinkedNoteList *pNoteStack = NULL;
 
 #define DIR_UP            0     // Upward direction
 #define DIR_DOWN          1     // Downward direction
-#define RANDOM_NUMBERS    30    // Size of random drive number table
 #define LED_PIN           11    // Teensy led pin
 
 
