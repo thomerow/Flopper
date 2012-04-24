@@ -13,7 +13,7 @@
 #define LED_PIN           11    // Teensy led pin
 
 /**
- * @brief  Note length in microseconds
+ * Note length in microseconds
  */
 const int noteLength[MIDI_NOTES] = {
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -30,7 +30,7 @@ const int noteLength[MIDI_NOTES] = {
 };
 
 /**
- * @brief  Note length in ticks. Is calculated from TIMER_RESOLUTION 
+ * Note length in ticks. Is calculated from TIMER_RESOLUTION 
  * and noteLength[] on statup.
  */
 int noteTicks[MIDI_NOTES];
@@ -46,24 +46,35 @@ byte currentNote[DRIVES];
 int currentTicks[DRIVES];
 
 /**
+ * Current head position.
+ */
+int currentPos[DRIVES];
+
+/**
+ * Number of 74HC595s
+ */
+const byte uRegisters = (((DRIVES * 2) - 1) / 8) + 1;
+
+/**
+ * Current shift register state.
+ */
+byte registerState[uRegisters];
+
+/**
+ * Next register state.
+ */
+byte nextRegState[uRegisters];
+
+/**
  * Current direction (see also DIR_UP and DIR_DOWN)
  */
 byte currentDir[DRIVES];
 
 /**
- * Current head position.
+ * 
  */
-int currentPos[DRIVES];
-
-const byte uRegisters = (((DRIVES * 2) - 1) / 8) + 1;
-
-/**
- * Shift register state.
- */
-byte registerState[uRegisters];
-
 struct DrivePinInfo {
-  byte uReg;      // 0 - based register index the drive is connected to
+  byte uReg;      // 0-based register index the drive is connected to
   byte uDirPin;   // number of direction pin
   byte uStepPin;  // number of motor pin
 };
@@ -87,7 +98,10 @@ void setup()
   SPI.begin();
 
   // Init registers
-  for (i = 0; i < uRegisters; ++i) registerState[i] = 0;
+  for (i = 0; i < uRegisters; ++i) {
+    registerState[i] = 0;
+    nextRegState[i] = 0;
+  }
   updateRegisters();
 
   // Calculate ticks per note
@@ -145,23 +159,20 @@ void initDrivePinInf()
  */
 inline void prepareStep(byte uDrive)
 { 
-  byte uReg, uDirPin, uStepPin, uStepPinState;
-  
   if (!currentPos[uDrive]) currentDir[uDrive] = DIR_UP;
   else if (currentPos[uDrive] == POSITION_MAX) currentDir[uDrive] = DIR_DOWN;
 
-  uReg = drivePinInf[uDrive].uReg;
-  uStepPin = drivePinInf[uDrive].uStepPin;
-  uDirPin = drivePinInf[uDrive].uDirPin;
+  if (DIR_UP) ++currentPos[uDrive]; else --currentPos[uDrive];
+  
+  DrivePinInfo& pinInf = drivePinInf[uDrive];
+  byte& regState = nextRegState[pinInf.uReg];
 
   // Clear direction pin state
-  registerState[uReg] &= ~(1 << uDirPin);
+  regState &= ~(1 << pinInf.uDirPin);
   
   // Set new pin states
-  registerState[uReg] ^= (1 << uStepPin);                    // Toggle motor pin
-  registerState[uReg] |= (currentDir[uDrive] << uDirPin);    // Set direction pin
-  
-  if (DIR_UP) ++currentPos[uDrive]; else --currentPos[uDrive];
+  regState ^= (1 << pinInf.uStepPin);                    // Toggle motor pin
+  regState |= (currentDir[uDrive] << pinInf.uDirPin);    // Set direction pin
 } // prepareStep
 
 inline void tick(byte uDrive) 
@@ -219,9 +230,22 @@ inline void updateRegisters()
 {
   byte i;
   
+  // First update direction pins:
+  
   digitalWrite(SS, LOW);
-  for (i = 0; i < uRegisters; ++i) SPI.transfer(registerState[i]);
+  for (i = 0; i < uRegisters; ++i) {
+    SPI.transfer((nextRegState[i] & B01010101) | (registerState[i] & B10101010));
+  }
   digitalWrite(SS, HIGH);
+  
+  // Then update stepper motor pins:
+  
+  digitalWrite(SS, LOW);
+  for (i = 0; i < uRegisters; ++i) {
+    SPI.transfer(nextRegState[i]);
+    registerState[i] = nextRegState[i]; // Copy next to current state    
+  }
+  digitalWrite(SS, HIGH);  
 } // updateRegisters
 
 /**
