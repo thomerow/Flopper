@@ -152,7 +152,7 @@ void AfterTouch(byte channel, byte pressure)
 
 void PitchChange(uint8_t channel, uint16_t pitch)
 {
-  // ToDo: implement.
+  // ToDo: implement
 } // PitchChange
 
 
@@ -240,8 +240,12 @@ void playNote(byte uNote)
   if (!noteTicks[uNote]) return;
   
   // Push currently playing note onto the stack
-  if (currentNote[0]) NoteStack_push(&pNoteStack, currentNote[0]);
+  if (currentNote[0]) NoteStack_push(&pNoteStack, currentNote[0]);  
   currentNote[0] = uNote;
+  
+#ifdef UNISONO
+  for (int i = 1; i < UNISONO; ++i) currentNote[i] = currentNote[0];
+#endif
 } // playNote
 
 
@@ -252,6 +256,10 @@ void stopNote(byte uNote)
   // Play previously played note.
   if (uNote != currentNote[0]) NoteStack_erase(&pNoteStack, uNote);  
   else currentNote[0] = NoteStack_popLast(&pNoteStack);
+  
+#ifdef UNISONO
+  for (int i = 1; i < UNISONO; ++i) currentNote[i] = currentNote[0];
+#endif
 } // stopNote
 
 

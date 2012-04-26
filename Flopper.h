@@ -2,7 +2,10 @@
 #define __FLOPPER_H__
 
 
-#define MONOPHONIC
+// #define MONOPHONIC
+#ifdef MONOPHONIC
+#define UNISONO 4
+#endif
 
 
 #define TIMER_RESOLUTION  40    // microseconds
@@ -12,7 +15,11 @@
 #ifdef MONOPHONIC
 #include "LinkedNoteList.h"
 LinkedNoteList *pNoteStack = NULL;
+#ifdef UNISONO
+#define DRIVES            UNISONO  // Play single note on UNISONO drives
+#else
 #define DRIVES            1     // Number of connected drives
+#endif
 #else
 #define DRIVES            4    // Number of connected drives
 #endif
