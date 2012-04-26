@@ -67,7 +67,7 @@ void loop()
 void initDrivePinInf()
 {
   for (int i = 0; i < DRIVES; ++i) {
-    drivePinInf[i].uReg = ((i * 2) - 1) / 8;
+    drivePinInf[i].uReg = uRegisters - ((i * 2) - 1) / 8 - 1;  // Backwards so register order is correct
     drivePinInf[i].uDirPin = (i * 2) % 8;
     drivePinInf[i].uStepPin = drivePinInf[i].uDirPin + 1;
   }

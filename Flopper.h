@@ -1,6 +1,7 @@
 #ifndef __FLOPPER_H__
 #define __FLOPPER_H__
 
+
 #define MONOPHONIC
 
 
@@ -13,7 +14,7 @@
 LinkedNoteList *pNoteStack = NULL;
 #define DRIVES            1     // Number of connected drives
 #else
-#define DRIVES            16    // Number of connected drives
+#define DRIVES            4    // Number of connected drives
 #endif
 
 #define DIR_UP            0     // Upward direction
@@ -31,7 +32,7 @@ const int noteLength[MIDI_NOTES] = {
   15289, 14436, 13621, 12856, 12135, 11454, 10811, 10205, 9632, 9091, 8581, 8099,       // C2 - B2
   7645, 7218, 6811, 6428, 6068, 5727, 5406, 5103, 4816, 4546, 4291, 4050,               // C3 - B3
   3823, 3609, 3406, 3214, 3034, 2864, 2703, 2552, 2408, 2273, 2146, 2025,               // C4 - B4
-  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+  1912, 1805, 1703, 1607, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
