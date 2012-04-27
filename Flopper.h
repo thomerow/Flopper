@@ -2,7 +2,7 @@
 #define __FLOPPER_H__
 
 
-#define MONOPHONIC
+//#define MONOPHONIC
 #ifdef MONOPHONIC
 #define UNISONO 4
 #endif

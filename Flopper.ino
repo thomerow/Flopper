@@ -232,7 +232,7 @@ void stopNote(byte uNote)
 {
   if (!noteTicks[uNote]) return;
   
-  int nDrive findDrivePlayingNote(uNote);
+  int nDrive = findDrivePlayingNote(uNote);
   currentNote[nDrive].uNote = 
   currentNote[nDrive].uVelocity = 0;
 } // stopNote
