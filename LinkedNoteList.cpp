@@ -39,12 +39,13 @@ inline LinkedNoteList* NoteStack_lastElem(LinkedNoteList *pStack)
 } // NoteStack_lastElem
 
 
-void NoteStack_push(LinkedNoteList **ppStack, byte uNote)
+void NoteStack_push(LinkedNoteList **ppStack, byte uNote, byte uVelocity)
 {  
   if (!uNote) return;
   
   LinkedNoteList* pElemNew = (LinkedNoteList*) malloc(sizeof(LinkedNoteList));
   pElemNew->uNote = uNote;
+  pElemNew->uVelocity = uVelocity;
   pElemNew->pPrev = NoteStack_lastElem(*ppStack);
   if (pElemNew->pPrev) pElemNew->pPrev->pNext = pElemNew;
   pElemNew->pNext = NULL;
@@ -60,20 +61,18 @@ byte NoteStack_last(LinkedNoteList *pStack)
 } // NoteStack_last
 
 
-byte NoteStack_popLast(LinkedNoteList **ppStack)
+void NoteStack_popLast(LinkedNoteList **ppStack, byte &uNote, byte &uVelocity)
 {
-  byte uResult;
-  
-  if (!*ppStack) return 0;
+  uNote = uVelocity = 0;
+  if (!*ppStack) return;
   
   LinkedNoteList* pLast = NoteStack_lastElem(*ppStack);
-  uResult = pLast->uNote;
+  uNote = pLast->uNote;
+  uVelocity = pLast->uVelocity;
     
   // Forget and delete element
   if (pLast->pPrev) pLast->pPrev->pNext = NULL;
   if (*ppStack == pLast) *ppStack = NULL;  
   free(pLast);
-  
-  return uResult;
 } // NoteStack_popLast
 

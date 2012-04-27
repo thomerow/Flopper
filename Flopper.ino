@@ -28,7 +28,7 @@ void setup()
 
   // Init arrays
   for (i = 0; i < DRIVES; ++i) {
-    currentNote[i] = 0;
+    currentNote[i].uNote = currentNote[i].uVelocity = 0;
     currentTicks[i] = 0;
     
     // Init drive position to max and direction to down so
@@ -98,9 +98,9 @@ inline void prepareStep(byte uDrive)
 
 inline void tick(byte uDrive) 
 {
-  if (!currentNote[uDrive]) return;
+  if (!currentNote[uDrive].uNote) return;
   ++currentTicks[uDrive];
-  if (currentTicks[uDrive] < noteTicks[currentNote[uDrive]]) return;
+  if (currentTicks[uDrive] < noteTicks[currentNote[uDrive].uNote]) return;
   prepareStep(uDrive);
   currentTicks[uDrive] = 0;
 } // tick
@@ -202,7 +202,7 @@ byte findNextIdleDrive()
 { 
   byte uResult = uNextDrive;    // Return uNextDrive if polyphony is used up
   for (int i = 0; i < DRIVES; ++i) {
-    if (!currentNote[uNextDrive]) {
+    if (!currentNote[uNextDrive].uNote) {
       uResult = uNextDrive++;
       if (uNextDrive == DRIVES) uNextDrive = 0;
       break;
@@ -214,25 +214,41 @@ byte findNextIdleDrive()
 
 inline int findDrivePlayingNote(byte uNote)
 {
-  for (int i = 0; i < DRIVES; ++i) if (currentNote[i] == uNote) return i;
+  for (int i = 0; i < DRIVES; ++i) if (currentNote[i].uNote == uNote) return i;
 } // findDrivePlayingNote
 
 
-void playNote(byte uNote)
+void playNote(byte uNote, byte uVelocity)
 {  
   if (!noteTicks[uNote]) return;
-  currentNote[findNextIdleDrive()] = uNote;
+  currentNote[findNextIdleDrive()].uNote = uNote;
+  currentNote[findNextIdleDrive()].uVelocity = uVelocity;
 } // playNote
 
 
 void stopNote(byte uNote)
 {
   if (!noteTicks[uNote]) return;
-  currentNote[findDrivePlayingNote(uNote)] = 0;
+  currentNote[findDrivePlayingNote(uNote)].uNote = 
+  currentNote[findDrivePlayingNote(uNote)].uVelocity = 0;
 } // stopNote
 
 
 #else // #ifndef MONOPHONIC
+
+
+#ifdef UNISONO
+
+void addUnisonoVoices(MIDINote &note)
+{
+  byte uVelocity = round(((double) UNISONO / 127) * note.uVelocity);
+  for (int i = 1; i < UNISONO; ++i) {
+    if (i >= uVelocity) currentNote[i].uNote = currentNote[i].uVelocity = 0;
+    else currentNote[i] = note;
+  }  
+} // addUnisonoVoices
+
+#endif
 
 
 void playNote(byte uNote, byte uVelocity)
@@ -240,15 +256,12 @@ void playNote(byte uNote, byte uVelocity)
   if (!noteTicks[uNote]) return;
   
   // Push currently playing note onto the stack
-  if (currentNote[0]) NoteStack_push(&pNoteStack, currentNote[0]);  
-  currentNote[0] = uNote;
+  if (currentNote[0].uNote) NoteStack_push(&pNoteStack, currentNote[0].uNote, currentNote[0].uVelocity);  
+  currentNote[0].uNote = uNote;
+  currentNote[0].uVelocity = uVelocity;
   
 #ifdef UNISONO
-  uVelocity = round(((double) UNISONO / 127) * uVelocity);
-  for (int i = 1; i < UNISONO; ++i) {
-    if (i >= uVelocity) currentNote[i] = 0;
-    else currentNote[i] = currentNote[0];
-  }
+  addUnisonoVoices(currentNote[0]);
 #endif
 } // playNote
 
@@ -258,11 +271,11 @@ void stopNote(byte uNote)
   if (!noteTicks[uNote]) return;
   
   // Play previously played note.
-  if (uNote != currentNote[0]) NoteStack_erase(&pNoteStack, uNote);  
-  else currentNote[0] = NoteStack_popLast(&pNoteStack);
+  if (uNote != currentNote[0].uNote) NoteStack_erase(&pNoteStack, uNote);  
+  else NoteStack_popLast(&pNoteStack, currentNote[0].uNote, currentNote[0].uVelocity);
   
 #ifdef UNISONO
-  for (int i = 1; i < UNISONO; ++i) currentNote[i] = currentNote[0];
+  addUnisonoVoices(currentNote[0]);
 #endif
 } // stopNote
 

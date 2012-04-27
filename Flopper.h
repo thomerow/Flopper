@@ -53,9 +53,17 @@ const int noteLength[MIDI_NOTES] = {
 int noteTicks[MIDI_NOTES];
 
 /**
+ * A MIDI note.
+ */
+struct MIDINote {
+  byte uNote;
+  byte uVelocity;
+};
+
+/**
  * Note of the playing drives.
  */
-volatile byte currentNote[DRIVES];
+MIDINote currentNote[DRIVES];
 
 /**
  * Elapsed ticks of playing drives.
@@ -119,6 +127,9 @@ void timerInt();
 void playNote(byte uNote, byte velocity);
 void stopNote(byte uNote);
 
+#ifdef UNISONO
+void addUnisonoVoices(volatile MIDINote &note);
+#endif
 
 #ifndef MONOPHONIC
 
