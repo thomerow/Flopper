@@ -8,9 +8,10 @@
 #endif
 
 
-#define TIMER_RESOLUTION  40    // microseconds
-#define MIDI_NOTES        128   // Number of existing midi notes
-#define POSITION_MAX      158   // tracks x 2 (each track is two stepper motor steps wide)
+#define TIMER_RESOLUTION  40     // microseconds (length of one "tick")
+#define BLINK_DURATION    3000   // ticks
+#define MIDI_NOTES        128    // Number of existing midi notes
+#define POSITION_MAX      158    // tracks x 2 (each track is two stepper motor steps wide)
 
 #ifdef MONOPHONIC
 #include "LinkedNoteList.h"
@@ -45,6 +46,8 @@ const int noteLength[MIDI_NOTES] = {
   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
   0, 0, 0, 0, 0, 0, 0, 0
 };
+
+int nLEDTicks = 0;
 
 /**
  * Note length in ticks. Is calculated from TIMER_RESOLUTION 
@@ -126,6 +129,8 @@ void resetAllPositions();
 void timerInt();
 void playNote(byte uNote, byte velocity);
 void stopNote(byte uNote);
+
+void blinkLED();
 
 #ifdef UNISONO
 void addUnisonoVoices(volatile MIDINote &note);

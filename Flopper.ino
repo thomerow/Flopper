@@ -96,6 +96,13 @@ inline void prepareStep(byte uDrive)
 } // prepareStep
 
 
+void blinkLED() 
+{
+  digitalWrite(LED_PIN, HIGH);
+  nLEDTicks = BLINK_DURATION;  
+} // blinkLED
+
+
 inline void tick(byte uDrive) 
 {
   if (!currentNote[uDrive].uNote) return;
@@ -110,6 +117,10 @@ void timerInt()
 {
   for (int i = 0; i < DRIVES; ++i) tick(i);  
   updateRegisters();
+  
+  if (nLEDTicks) {
+    if (!--nLEDTicks) digitalWrite(LED_PIN, LOW); 
+  }
 } // timerInt
 
 
@@ -117,12 +128,16 @@ void _NoteOn(byte channel, byte note, byte velocity)
 {
   if (velocity) playNote(note, velocity);
   else stopNote(note);
+  
+  blinkLED();
 } // NoteOn
 
 
 void _NoteOff(byte channel, byte note, byte velocity)
 {
   stopNote(note);
+  
+  blinkLED();
 } // NoteOff
 
 
