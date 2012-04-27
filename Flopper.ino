@@ -203,10 +203,11 @@ byte findNextIdleDrive()
   byte uResult = uNextDrive;    // Return uNextDrive if polyphony is used up
   for (int i = 0; i < DRIVES; ++i) {
     if (!currentNote[uNextDrive].uNote) {
-      uResult = uNextDrive++;
-      if (uNextDrive == DRIVES) uNextDrive = 0;
+      uResult = uNextDrive;
+      if (++uNextDrive == DRIVES) uNextDrive = 0;
       break;
     }
+    if (++uNextDrive == DRIVES) uNextDrive = 0;
   }
   return uResult;
 } // findFirstIdleDrive
