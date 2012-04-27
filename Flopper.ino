@@ -221,16 +221,20 @@ inline int findDrivePlayingNote(byte uNote)
 void playNote(byte uNote, byte uVelocity)
 {  
   if (!noteTicks[uNote]) return;
-  currentNote[findNextIdleDrive()].uNote = uNote;
-  currentNote[findNextIdleDrive()].uVelocity = uVelocity;
+  
+  int nDrive = findNextIdleDrive();
+  currentNote[nDrive].uNote = uNote;
+  currentNote[nDrive].uVelocity = uVelocity;
 } // playNote
 
 
 void stopNote(byte uNote)
 {
   if (!noteTicks[uNote]) return;
-  currentNote[findDrivePlayingNote(uNote)].uNote = 
-  currentNote[findDrivePlayingNote(uNote)].uVelocity = 0;
+  
+  int nDrive findDrivePlayingNote(uNote);
+  currentNote[nDrive].uNote = 
+  currentNote[nDrive].uVelocity = 0;
 } // stopNote
 
 
