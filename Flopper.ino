@@ -246,7 +246,7 @@ void playNote(byte uNote, byte uVelocity)
 #ifdef UNISONO
   uVelocity = round(((double) UNISONO / 127) * uVelocity);
   for (int i = 1; i < UNISONO; ++i) {
-    if (i > uVelocity) currentNote[i] = 0;
+    if (i >= uVelocity) currentNote[i] = 0;
     else currentNote[i] = currentNote[0];
   }
 #endif
