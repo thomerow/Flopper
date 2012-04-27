@@ -2,7 +2,7 @@
 #define __FLOPPER_H__
 
 
-// #define MONOPHONIC
+#define MONOPHONIC
 #ifdef MONOPHONIC
 #define UNISONO 4
 #endif
@@ -116,7 +116,7 @@ void updateRegisters();
 void initDrivePinInf();
 void resetAllPositions();
 void timerInt();
-void playNote(byte uNote);
+void playNote(byte uNote, byte velocity);
 void stopNote(byte uNote);
 
 

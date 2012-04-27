@@ -115,7 +115,7 @@ void timerInt()
 
 void _NoteOn(byte channel, byte note, byte velocity)
 {
-  if (velocity) playNote(note);
+  if (velocity) playNote(note, velocity);
   else stopNote(note);
 } // NoteOn
 
@@ -235,7 +235,7 @@ void stopNote(byte uNote)
 #else // #ifndef MONOPHONIC
 
 
-void playNote(byte uNote)
+void playNote(byte uNote, byte uVelocity)
 {
   if (!noteTicks[uNote]) return;
   
@@ -244,7 +244,11 @@ void playNote(byte uNote)
   currentNote[0] = uNote;
   
 #ifdef UNISONO
-  for (int i = 1; i < UNISONO; ++i) currentNote[i] = currentNote[0];
+  uVelocity = round(((double) UNISONO / 127) * uVelocity);
+  for (int i = 1; i < UNISONO; ++i) {
+    if (i > uVelocity) currentNote[i] = 0;
+    else currentNote[i] = currentNote[0];
+  }
 #endif
 } // playNote
 
