@@ -111,7 +111,7 @@ void blinkLED()
 
 inline void tick(byte uDrive) 
 {
-  if (!currentNote[uDrive].uNote) return;
+  if (!currentNote[uDrive].uNote) { if (drivePinInf[uDrive].uCurrentState) performStep(uDrive); ;return; }
   ++currentTicks[uDrive];
   if (currentTicks[uDrive] < noteTicks[currentNote[uDrive].uNote]) return;
   performStep(uDrive);
