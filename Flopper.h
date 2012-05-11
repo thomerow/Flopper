@@ -2,14 +2,14 @@
 #define __FLOPPER_H__
 
 
-//#define MONOPHONIC
+#define MONOPHONIC
 #ifdef MONOPHONIC
 #define UNISONO 4
 #endif
 
 
 #define TIMER_RESOLUTION  40     // microseconds (length of one "tick")
-#define BLINK_DURATION    3000   // ticks
+#define BLINK_DURATION    2000   // ticks
 #define MIDI_NOTES        128    // Number of existing midi notes
 #define POSITION_MAX      158    // tracks x 2 (each track is two stepper motor steps wide)
 
