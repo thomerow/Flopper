@@ -7,7 +7,6 @@
 #define UNISONO 4
 #endif
 
-
 #define TIMER_RESOLUTION  40     // microseconds (length of one "tick")
 #define BLINK_DURATION    2000   // ticks
 #define MIDI_NOTES        128    // Number of existing midi notes
@@ -25,9 +24,10 @@ LinkedNoteList *pNoteStack = NULL;
 #define DRIVES            4    // Number of connected drives
 #endif
 
-#define DIR_UP            0     // Upward direction
-#define DIR_DOWN          1     // Downward direction
-#define LED_PIN           11    // Teensy led pin
+#define DIR_UP            LOW    // Upward direction
+#define DIR_DOWN          HIGH   // Downward direction
+#define FIRST_PIN         5      // First pin to use for floppy drive connections
+#define LED_PIN           21     // Led pin
 
 
 /**
@@ -79,21 +79,6 @@ int currentTicks[DRIVES];
 int currentPos[DRIVES];
 
 /**
- * Number of 74HC595s
- */
-const byte uRegisters = (((DRIVES * 2) - 1) / 8) + 1;
-
-/**
- * Current shift register state.
- */
-byte registerState[uRegisters];
-
-/**
- * Next register state.
- */
-byte nextRegState[uRegisters];
-
-/**
  * Current direction (see also DIR_UP and DIR_DOWN)
  */
 byte currentDir[DRIVES];
@@ -102,9 +87,9 @@ byte currentDir[DRIVES];
  * 
  */
 struct DrivePinInfo {
-  byte uReg;      // 0-based register index the drive is connected to
-  byte uDirPin;   // number of direction pin
-  byte uStepPin;  // number of motor pin
+  byte uDirPin;           // number of direction pin
+  byte uStepPin;          // number of motor pin
+  byte uCurrentState;     // Current pin state (high or low)
 };
 
 DrivePinInfo drivePinInf[DRIVES];
@@ -123,7 +108,6 @@ void _ProgramChange(byte channel, byte program);
 void AfterTouch(byte channel, byte pressure);
 void PitchChange(uint8_t channel, uint16_t pitch);
   
-void updateRegisters();
 void initDrivePinInf();
 void resetAllPositions();
 void timerInt();
