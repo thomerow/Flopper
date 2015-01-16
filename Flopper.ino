@@ -1,7 +1,6 @@
+#include <TimerOne.h>
 #include <SPI.h>
 #include "Flopper.h"
-#include "TimerOne.h"
-
 
 void setup()
 {
@@ -111,7 +110,7 @@ void blinkLED()
 
 inline void tick(byte uDrive) 
 {
-  if (!currentNote[uDrive].uNote) { if (drivePinInf[uDrive].uCurrentState) performStep(uDrive); ;return; }
+  if (!currentNote[uDrive].uNote) { if (drivePinInf[uDrive].uCurrentState) performStep(uDrive); return; }
   ++currentTicks[uDrive];
   if (currentTicks[uDrive] < noteTicks[currentNote[uDrive].uNote]) return;
   performStep(uDrive);
@@ -171,12 +170,10 @@ void AfterTouch(byte channel, byte pressure)
 } // AfterTouch
 
 
-void PitchChange(uint8_t channel, uint16_t pitch)
+void PitchChange(uint8_t channel, int pitch)
 {
   // ToDo: implement
 } // PitchChange
-
-
 
 
 /**
